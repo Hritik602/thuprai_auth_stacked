@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-import 'package:thuprai_stacked_architecture/ui/common/app_colors.dart';
-import 'package:thuprai_stacked_architecture/ui/common/ui_helpers.dart';
+import 'package:thuprai_stacked_architecture/ui/views/home/model/book_model.dart';
 
 import 'home_viewmodel.dart';
 
@@ -15,66 +14,45 @@ class HomeView extends StackedView<HomeViewModel> {
     Widget? child,
   ) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                verticalSpaceLarge,
-                Column(
-                  children: [
-                    const Text(
-                      'Hello, STACKED!',
-                      style: TextStyle(
-                        fontSize: 35,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    verticalSpaceMedium,
-                    MaterialButton(
-                      color: Colors.black,
-                      onPressed: viewModel.incrementCounter,
-                      child: Text(
-                        viewModel.counterLabel,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    MaterialButton(
-                      color: kcDarkGreyColor,
-                      onPressed: viewModel.showDialog,
-                      child: const Text(
-                        'Show Dialog',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    MaterialButton(
-                      color: kcDarkGreyColor,
-                      onPressed: viewModel.showBottomSheet,
-                      child: const Text(
-                        'Show Bottom Sheet',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.more_vert,
+              ),
+              color: Colors.black,
+            )
+          ],
         ),
-      ),
-    );
+        body: SafeArea(
+            minimum: const EdgeInsets.all(10),
+            child: FutureBuilder(
+              future: viewModel.fetchBooks(1),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                BookReleaseModel bookReleaseModel =
+                    snapshot.data as BookReleaseModel;
+
+                return ListView.builder(
+                    itemCount: bookReleaseModel.results?.length,
+                    itemBuilder: (context, index) {
+                      return Text(
+                          bookReleaseModel.results![index].englishTitle ?? "");
+                      // return BookListTile(
+                      //   books: bookReleaseModel.results![index],
+                      //   onTap: () {
+                      //     // viewModel.navigateToBookDetailPage(
+                      //     //     bookReleaseModel.results![index].slug!);
+                      //   },
+                      // );
+                    });
+              },
+            )));
   }
 
   @override
